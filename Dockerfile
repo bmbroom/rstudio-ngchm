@@ -12,8 +12,10 @@ FROM rocker/rstudio
 
 MAINTAINER Bradley Broom <bmbroom@mdanderson.org>
 
-RUN apt-get update && apt-get -y install libxml2-dev openjdk-7-jre-headless && apt-get -y clean
+RUN apt-get update \
+ && apt-get -y install openssh-client libssh2-1-dev libxml2-dev openjdk-8-jre-headless \
+ && apt-get -y clean
 
-COPY install.R /tmp/install.R
-
-RUN Rscript /tmp/install.R && /bin/rm /tmp/install.R
+RUN Rscript \
+ -e 'install.packages("devtools")' \
+ -e 'devtools::install_github(c("bmbroom/tsvio@stable","bmbroom/NGCHMR@beta"))'
