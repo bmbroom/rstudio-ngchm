@@ -13,7 +13,7 @@ FROM rocker/rstudio
 MAINTAINER Bradley Broom <bmbroom@mdanderson.org>
 
 RUN apt-get update \
- && apt-get -y install libssl-dev openssh-client libssh2-1-dev libxml2-dev openjdk-7-jre-headless \
+ && apt-get -y install libssl-dev openssh-client libssh2-1-dev libxml2-dev openjdk-8-jre-headless zlib1g-dev \
  && apt-get -y clean
 
 RUN sh -c 'cd /root && git clone https://github.com/ropensci/git2r.git && cd git2r && make install'
