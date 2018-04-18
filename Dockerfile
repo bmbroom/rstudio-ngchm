@@ -20,7 +20,7 @@ MAINTAINER Bradley Broom <bmbroom@mdanderson.org>
 RUN echo "SHAIDYMAPGEN=/NGCHM/shaidymapgen/ShaidyMapGen.jar" >> /usr/local/lib/R/etc/Renviron
 
 # Define utility function to display viewer.
-RUN echo 'chmViewer <- function() { rstudioapi::viewer(file.path(tempdir(), "viewer", "chm.html")); }' >> /usr/local/lib/R/etc/Rprofile.site
+RUN echo 'chmViewer <- function() { rstudioapi::viewer(file.path(tempdir(), "ngChmApp.html")); }' >> /usr/local/lib/R/etc/Rprofile.site
 
 # Show the user a little help.
 RUN echo 'cat ("Type' "'chmViewer()'" 'to open the standalone NG-CHM viewer.\n");' >> /usr/local/lib/R/etc/Rprofile.site
@@ -39,8 +39,8 @@ RUN Rscript \
  -e 'install.packages("devtools")' \
  -e 'devtools::install_github(c("bmbroom/tsvio@stable","bmbroom/NGCHMR@master"))'
 
-# Copy NGCHM build artifacts into this image.
+# Copy all NGCHM build artifacts into this image.
 COPY --from=ngchm /NGCHM /NGCHM/
 # Copy viewer to a place RStudio can serve it.
-RUN echo 'system2("cp", c("-r","/NGCHM/viewer",tempdir()));' >> /usr/local/lib/R/etc/Rprofile.site
+RUN echo 'system2("cp", c("/NGCHM/standalone/ngChmApp.html",tempdir()));' >> /usr/local/lib/R/etc/Rprofile.site
 
