@@ -1,7 +1,7 @@
 # Multistage build.
 
 # Import NGCHM build artifacts
-FROM ngchm/ngchm:latest AS ngchm
+FROM ngchm/ngchm:2.16.0 AS ngchm
 
 # Preinstall the NGCHM R library into an rstudio container.
 
@@ -13,7 +13,7 @@ FROM ngchm/ngchm:latest AS ngchm
 # - Connect to your NGCHM server (see https://github.com/bmbroom/NGCHMR/blob/master/README.md
 #   for pointers to documentation).
 
-FROM rocker/rstudio
+FROM rocker/rstudio:3.6.2
 
 MAINTAINER Bradley Broom <bmbroom@mdanderson.org>
 
@@ -30,7 +30,7 @@ RUN echo 'cat ("Type' "'help(package=NGCHM)'" 'to show documentation for the NG-
 RUN echo 'Sys.setenv("DISPLAY"="");' >> /usr/local/lib/R/etc/Rprofile.site
 
 RUN apt-get update \
- && apt-get -y install libssl-dev openssh-client libssh2-1-dev libxml2-dev openjdk-8-jre-headless zlib1g-dev \
+ && apt-get -y install libssl-dev openssh-client libssh2-1-dev libxml2-dev openjdk-11-jre-headless zlib1g-dev \
  && apt-get -y clean
 
 RUN sh -c 'cd /root && git clone https://github.com/ropensci/git2r.git && cd git2r && make install'
