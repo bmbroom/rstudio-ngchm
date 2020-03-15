@@ -42,5 +42,17 @@ RUN Rscript \
 # Copy all NGCHM build artifacts into this image.
 COPY --from=ngchm /NGCHM /NGCHM/
 # Copy viewer to a place RStudio can serve it.
-RUN echo 'system2("cp", c("/NGCHM/standalone/ngChmApp.html",tempdir()));' >> /usr/local/lib/R/etc/Rprofile.site
+RUN echo '\n\
+apppath <- file.path(tempdir(), "ngChmApp.html"); \n\
+if (Sys.getenv("NGCHM_UPDATE", "true") == "true") {\n\
+    warning("NGCHM web update:"); \n\
+    appok <- utils::download.file ("https://www.ngchm.net/Downloads/ngChmApp.html", apppath, quiet=TRUE) == 0; \n\
+    if (!appok) warning("Unable to download ngChmApp.html. Using default."); \n\
+    warning("NGCHM web update finished."); \n\
+} else { appok <- FALSE; } \n\
+if (!appok) { \n\
+    system2("cp", c("/NGCHM/standalone/ngChmApp.html",apppath)); \n\
+} \n\
+' >> /usr/local/lib/R/etc/Rprofile.site
 
+RUN echo 'echo "NGCHM_UPDATE=$NGCHM_UPDATE" >> /usr/local/lib/R/etc/Renviron\n' >> /etc/cont-init.d/userconf
