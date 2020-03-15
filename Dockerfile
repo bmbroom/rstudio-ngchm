@@ -23,8 +23,8 @@ RUN echo "SHAIDYMAPGEN=/NGCHM/shaidymapgen/ShaidyMapGen.jar" >> /usr/local/lib/R
 RUN echo 'chmViewer <- function() { rstudioapi::viewer(file.path(tempdir(), "ngChmApp.html")); }' >> /usr/local/lib/R/etc/Rprofile.site
 
 # Show the user a little help.
-RUN echo 'cat ("Type' "'chmViewer()'" 'to open the standalone NG-CHM viewer.\n");' >> /usr/local/lib/R/etc/Rprofile.site
-RUN echo 'cat ("Type' "'help(package=NGCHM)'" 'to show documentation for the NG-CHM package.\n");' >> /usr/local/lib/R/etc/Rprofile.site
+RUN echo 'message ("Type' "'chmViewer()'" 'to open the standalone NG-CHM viewer.\n");' >> /usr/local/lib/R/etc/Rprofile.site
+RUN echo 'message ("Type' "'help(package=NGCHM)'" 'to show documentation for the NG-CHM package.\n");' >> /usr/local/lib/R/etc/Rprofile.site
 
 # Workaround hack in RStudio that breaks ShaidyMapGen
 RUN echo 'Sys.setenv("DISPLAY"="");' >> /usr/local/lib/R/etc/Rprofile.site
