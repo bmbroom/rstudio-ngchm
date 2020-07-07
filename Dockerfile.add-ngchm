@@ -1,0 +1,28 @@
+# Multistage build.
+
+ARG NGCHMIMAGE=ngchm/ngchm
+ARG RSTUDIOPREIMAGE=ngchm/rstudio-ngchm-pre-core
+
+# Import NGCHM build artifacts
+FROM ${NGCHMIMAGE} AS ngchm
+
+# Add the NGCHM system and R library to the NGCHM rstudio core prebuilt container.
+
+# To run:
+# - Follow the instructions at https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image
+#   but substitute bmbroom/rstudio-ngchm for the name of the docker image.
+# - Open the rstdio port (default 8787) in your browser and login (default rstudio/rstudio).
+# - Load the NGCHM library: library(NGCHM)
+# - Connect to your NGCHM server (see https://github.com/bmbroom/NGCHMR/blob/master/README.md
+#   for pointers to documentation).
+
+FROM ${RSTUDIOPREIMAGE}
+
+MAINTAINER Bradley Broom <bmbroom@mdanderson.org>
+
+RUN Rscript -e 'devtools::install_github(c("MD-Anderson-Bioinformatics/tsvio@stable","MD-Anderson-Bioinformatics/NGCHM-R@master"))'
+RUN Rscript -e 'missing <- setdiff(c("tsvio", "NGCHM"), installed.packages()[,"Package"]); \
+                if (length(missing) > 0) stop (paste("Some R packages failed to install: ", paste(missing, collapse=", ")), call.=FALSE)'
+
+# Copy all NGCHM build artifacts into this image.
+COPY --from=ngchm /NGCHM /NGCHM/

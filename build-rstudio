@@ -1,0 +1,19 @@
+#!/bin/sh
+NGCHMIMAGE=ngchm/ngchm:latest
+RSTUDIOVERSION=3.6.3
+
+RSTUDIOIMAGE=rocker/rstudio:${RSTUDIOVERSION}
+RSTUDIOPRECORE=ngchm/rstudio-ngchm-pre-core:${RSTUDIOVERSION}
+RSTUDIOCORE=ngchm/rstudio-ngchm:${RSTUDIOVERSION}
+RSTUDIOPREBIOC=ngchm/rstudio-ngchm-pre-bioc:${RSTUDIOVERSION}
+RSTUDIOBIOC=ngchm/rstudio-ngchm-bioc:${RSTUDIOVERSION}
+RSTUDIOPRESC=ngchm/rstudio-ngchm-pre-sc:${RSTUDIOVERSION}
+RSTUDIOSC=ngchm/rstudio-ngchm-sc:${RSTUDIOVERSION}
+
+docker build -t ${RSTUDIOPRECORE} -f Dockerfile.pre.core --build-arg RSTUDIOIMAGE=${RSTUDIOIMAGE} .                                         && \
+docker build -t ${RSTUDIOPREBIOC} -f Dockerfile.pre.bioc --build-arg RSTUDIOPRECORE=${RSTUDIOPRECORE} .                                     && \
+docker build -t ${RSTUDIOPRESC}   -f Dockerfile.pre.sc   --build-arg RSTUDIOPREBIOC=${RSTUDIOPREBIOC} .                                     && \
+\
+docker build -t ${RSTUDIOCORE} -f Dockerfile.add-ngchm --build-arg RSTUDIOPREIMAGE=${RSTUDIOPRECORE} --build-arg NGCHMIMAGE=${NGCHMIMAGE} . && \
+docker build -t ${RSTUDIOBIOC} -f Dockerfile.add-ngchm --build-arg RSTUDIOPREIMAGE=${RSTUDIOPREBIOC} --build-arg NGCHMIMAGE=${NGCHMIMAGE} . && \
+docker build -t ${RSTUDIOSC}   -f Dockerfile.add-ngchm --build-arg RSTUDIOPREIMAGE=${RSTUDIOPRESC}   --build-arg NGCHMIMAGE=${NGCHMIMAGE} .

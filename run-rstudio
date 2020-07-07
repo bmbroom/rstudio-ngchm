@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# Example Unix/Linux script for running the rstudio-ngchm docker container.
+IMAGE=ngchm/rstudio-ngchm-sc
+docker run -d --name rstudio --rm -e HTTR_PORT=1234 -e NGCHM_UPDATE=false -e PASSWORD=password -p 8787:8787 -e USERID=`id -u` -e GROUPID=`id -g` -v $HOME/rstudio:/home/rstudio ${IMAGE}

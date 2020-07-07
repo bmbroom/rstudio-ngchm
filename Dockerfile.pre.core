@@ -1,9 +1,14 @@
-# Multistage build.
 
-# Import NGCHM build artifacts
-FROM ngchm/ngchm:2.16.0 AS ngchm
+# BASE RSTUDIO image to use:
+ARG RSTUDIOIMAGE=rocker/rstudio
 
-# Preinstall the NGCHM R library into an rstudio container.
+# Create a partial image that can be used for installing the
+# NGCHM system and R library into an rstudio container.
+
+# Note: The image created by this Dockerfile is intended to be used as a partial image
+#       for subsequent builds that will add the NGCHM system and R library.  It is not
+#       intended to be run.
+#       
 
 # To run:
 # - Follow the instructions at https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image
@@ -13,7 +18,7 @@ FROM ngchm/ngchm:2.16.0 AS ngchm
 # - Connect to your NGCHM server (see https://github.com/bmbroom/NGCHMR/blob/master/README.md
 #   for pointers to documentation).
 
-FROM rocker/rstudio:3.6.2
+FROM ${RSTUDIOIMAGE}
 
 MAINTAINER Bradley Broom <bmbroom@mdanderson.org>
 
@@ -35,13 +40,8 @@ RUN apt-get update \
 
 RUN sh -c 'cd /root && git clone https://github.com/ropensci/git2r.git && cd git2r && make install'
 
-RUN Rscript \
- -e 'install.packages("devtools")' \
- -e 'devtools::install_github(c("bmbroom/tsvio@stable","bmbroom/NGCHMR@master"))'
-
-# Copy all NGCHM build artifacts into this image.
-COPY --from=ngchm /NGCHM /NGCHM/
-# Copy viewer to a place RStudio can serve it.
+# Add a function that updates the standalone ngChmApp.html browser if the environment
+# variable NGCHM_UPDATE is not set to something other than TRUE.
 RUN echo '\n\
 apppath <- file.path(tempdir(), "ngChmApp.html"); \n\
 if (Sys.getenv("NGCHM_UPDATE", "true") == "true") {\n\
@@ -56,3 +56,8 @@ if (!appok) { \n\
 ' >> /usr/local/lib/R/etc/Rprofile.site
 
 RUN echo 'echo "NGCHM_UPDATE=$NGCHM_UPDATE" >> /usr/local/lib/R/etc/Renviron\n' >> /etc/cont-init.d/userconf
+
+RUN Rscript -e "options(Ncpus=`nproc`)" -e 'install.packages(c("devtools", "XML", "RCurl"))'
+
+RUN Rscript -e 'missing <- setdiff(c("devtools", "XML", "RCurl"), installed.packages()[,"Package"]); \
+                if (length(missing) > 0) stop (paste("Some R packages failed to install: ", paste(missing, collapse=", ")), call.=FALSE)'

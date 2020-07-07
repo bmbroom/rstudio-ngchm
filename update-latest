@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ] ; then
+    echo Usage: $0 version-to-tag
+    exit 1
+fi
+RSTUDIOVERSION="$1"
+IMAGES="ngchm/rstudio-ngchm ngchm/rstudio-ngchm-bioc ngchm/rstudio-ngchm-sc"
+
+for img in $IMAGES ; do
+   echeck=`docker images "${img}:${RSTUDIOVERSION}" | wc -l`
+   if [ "$echeck" -ne 2 ] ; then
+       echo "$0: docker image ${img}:${RSTUDIOVERSION} not found. Skipping."
+   else
+       echo Updating $img from "$RSTUDIOVERSION" to latest
+       docker tag "${img}:${RSTUDIOVERSION}" "${img}:latest"
+       docker push "${img}:${RSTUDIOVERSION}"
+       docker push "${img}:latest"
+   fi
+done

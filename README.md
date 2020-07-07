@@ -19,6 +19,10 @@ Once Docker/Docker Desktop is up and running:
 ```
   docker run -d -p 8787:8787 -v /tmp/rstudio:/home/rstudio -e USERID=`id -u` -e GROUPID=`id -g` -e PASSWORD=yourpassword ngchm/rstudio-ngchm
 ```
+* Run the docker container (Windows):
+```sh
+docker run -d -p 8787:8787 -v "C:/path.to.directory":/home/rstudio -e PASSWORD=yourpassword ngchm/rstudio-ngchm
+```
 
 When the container is running:
 
@@ -43,6 +47,20 @@ Although developed for exploring genome-scale omic data, NGCHM's are agnostic to
 
 This [brief video](https://www.youtube.com/watch?v=DuObpGNpDhw) briefly describes the key features of the NGCHM system.  Our [Youtube channel](https://www.youtube.com/channel/UCADGir2q8IaI9cGQuzjSL9w/videos) includes many other videos about the NGCHM system.
 
+## Images with Additional R Packages Preinstalled
+
+In addition to the base image (ngchm/rstudio-ngchm), we also provide additional images with additional R packages preinstalled:
+
+* ngchm/rstudio-ngchm-bioc which has the Bioconductor and TCGAbiolinks R packages preinstalled
+* ngchm/rstudio-ngchm-sc which also has the single-cell R packages Seurat and singleCellTK preinstalled
+
+## Versions
+
+The version tag on the images reflects the version number of the R system included in the RStudio container.
+
+New images with updated NGCHM, Bioconductor, or other packages/tools might be uploaded to Docker Hub under the same tag.  Please tag the image
+with your own immutable identifier if you need a permanent reference to a specific image.
+
 ## Browser support
 
 Our goal is to support all major browsers up to a year old.
@@ -52,7 +70,7 @@ Our goal is to support all major browsers up to a year old.
 We welcome contributions to the NGCHM system, including
 
 * Bug reports
-* Feature requests
+* Feature requests (including popular R packages that should be included in an image)
 * Pull requests
 
 Please direct contributions as follows:
@@ -60,6 +78,15 @@ Please direct contributions as follows:
 * Regarding the NGCHM viewer to the [NGCHM Github](https://github.com/MD-Anderson-Bioinformatics/NG-CHM) page,
 * Regarding the NGCHM R package to the [NGCHM-R Github](https://github.com/MD-Anderson-Bioinformatics/NGCHM-R) page,
 * Regarding the integration with RStudio to this page.
+
+## About the Dockerfiles
+
+To minimize the time required to rebuild the docker images when the NGCHM system or R package are updated, I have created
+a sequence of Dockerfiles that progressively build docker images with more features (core build, with Bioconductor, with single cell packages).
+These images have tags that include "pre".  They are not meant to be run and are not uploaded to docker hub.
+
+The Dockerfile.add-ngchm then adds the NGCHM system and R package to each of these.  See the build-rstudio script for details.
+
 ## License
 
 The NGCHM code is available under the GNU General Public License, version 2.
